@@ -17,6 +17,11 @@ def test_number_of_sim():
     phone1 = Phone("iPhone 14", 120000, 5, 2)
     assert phone1.number_of_sim == 2
 
+def test_add():
+    phone1 = Phone("iPhone 14", 120000, 5, 2)
+    item1 = Item("Смартфон", 10000, 20)
+    assert item1 + phone1 == 25
+
 def test__str__():
     phone1 = Phone("iPhone 14", 120000, 5, 2)
     # Проверяем методы
