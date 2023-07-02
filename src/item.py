@@ -47,19 +47,18 @@ class Item:
         Применяет установленную скидку для конкретного товара.
         """
         self.price *= self.pay_rate
-        return self.price
 
     @property
     def name(self):
         return self.__name
 
     @name.setter
-    def name(self, add_name: str):
-        if len(add_name) <= 10:
-                self.__name = add_name
+    def name(self, new_name: str):
+        if len(new_name) <= 10:
+            self.__name = new_name
 
         else:
-            raise Exception ("Длина наименования товара превышает 10 символов")
+            raise Exception("Длина наименования товара превышает 10 символов")
 
     @classmethod
     def instantiate_from_csv(cls) -> None:
@@ -68,12 +67,15 @@ class Item:
         """
         cls.all.clear()
         dir_path = os.path.dirname(os.path.realpath(__file__))
-        #dir_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'items.csv')
-        with open(dir_path + '/items.csv', encoding="utf-8") as csv_file:
-            reader = csv.DictReader(csv_file)
-
-            for row in reader:
-                cls(row['name'], row['price'], row['quantity'])
+        try:
+            with open(dir_path + '/items.csv', encoding="utf-8") as csv_file:
+                reader = csv.DictReader(csv_file)
+                for row in reader:
+                    if len(row['name']) == 0 or int(row['price']) < 1 or int(row['quantity']) < 0:
+                        raise InstantiateCSVError('Файл item.csv поврежден')
+                    cls(row['name'], float(row['price']), int(row['quantity']))
+        except FileNotFoundError:
+            raise FileNotFoundError('Отсутствует файл item.csv')
 
     @staticmethod
     def string_to_number(num):
@@ -82,3 +84,15 @@ class Item:
         """
         numb = float(num)
         return int(numb)
+
+
+class InstantiateCSVError(Exception):
+    '''
+    Исключения повреждения CSV-файла
+    '''
+
+    def __init__(self, message):
+        self.message = message
+
+    def __str__(self):
+        return f'{self.message}'
